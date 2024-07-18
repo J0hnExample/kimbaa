@@ -1,61 +1,78 @@
-// istanbul ignore file
+import { UserResource, AntragAnlage2Resource, ApplicationResource } from "./Resources";
+import { User, IUser } from "./model/UserModel";
+import { AntragAnlage2, IAntragAnlage2 } from "./model/AntragAnlage2Model";
+import { Application, IApplication } from "./model/AntragZulassungModel";
+import * as userService from "./services/UserService";
+import * as antragAnlage2Service from "./services/AntragAnlage2Service";
+import * as antragZulassungService from "./services/AntragZulassungService";
+import { logger } from "./logger/testLogger";
 
-/*Vorlagen .*/
-
-import { UserResource } from "../src/Resources";
-//import { logger } from "./logger";
-
-import { User } from "../src/model/UserModel";
-
-import { createUser } from "../src/services/UserService";
-
-
-/**
- * Erzeugt einen Benutzer "Behrens" und vom ihm angelegten antrag mit Einträgen.
- * Diese Funktion benötigen wir später zu Testzwecken im Frontend.
-*/
-export async function prefillDB(): Promise<{ heinz: UserResource}> {
-    
+export async function prefillDB(): Promise<{ user?: UserResource | IUser, AntragAnlage2?: AntragAnlage2Resource | IAntragAnlage2; application?: ApplicationResource | IApplication } | null> {
     await User.syncIndexes();
-    //antrag
-    const UserResource: UserResource = {
-        name: "Behrens",
-        studentId: "123456",
-        password: "123_abc_ABC",
-        admin: true,
-        email: "",
-        //department: "",
-        //creditPoints: 0,
-        //phone: 0
-    }
-    const heinz = await createUser(UserResource);
-    //logger.info(`Prefill DB with test data, user: ${UserResource.name}, password 123_abc_ABC`);
+    await AntragAnlage2.syncIndexes();
+    await Application.syncIndexes();
 
-    return { heinz };   
-}
-    /* const protokolle: ProtokollResource[] = [];
-    
-    const itemsPerList = [[1, 4, 2, 0], [3, 5, 7]];
-    const patienten = ["Hans", "Clawdia"];
-    const datumPostfix = [".10.1907", ".11.1907"];
-    const publicValue = [true, false];
-    const getraenke = ["Kaffee", "Tee", "Sekt", "Limo"];
-    const mengen = [150, 180, 200, 300];
-    
-    for (let k = 0; k < 2; k++) {
-        for (let i = 0; i < itemsPerList[k].length; i++) {
-            const protokoll = await createProtokoll({ patient: patienten[k], datum: (i + 1) + datumPostfix[k], public: publicValue[k], ersteller: behrens.id!, closed: false })
-            let gesamtMenge = 0;
-            for (let m = 0; m < itemsPerList[k][i]; m++) {
-                const eintrag = await createEintrag({
-                    getraenk: getraenke[m % getraenke.length], menge: mengen[m % mengen.length],
-                    protokoll: protokoll.id!, ersteller: behrens.id!
-                })
-                gesamtMenge += eintrag.menge;
-            }
-            protokolle.push({ ...protokoll, gesamtMenge: gesamtMenge });
-        }
+    // Check if user already exists
+    const existUser: IUser | null = await User.findOne({ email: "hm5555@bht-berlin.de" }).exec();
+    if (!existUser) {
+        // Create Hans Maulwurf via service
+        const user = await userService.createUser({
+            name: "Hans Maulwurf",
+            email: "hm5555@bht-berlin.de",
+            studentId: "555555",
+            password: "!12345Ab",
+            course: "Medieninformatik"
+        }) as UserResource;
+        logger.info("Prefill User created: " + user);
+
+        const antragAnlage2 = await antragAnlage2Service.createAntragAnlage2({
+            creator: user.id!,
+            themenvorschlag: "Vector eine Hügels mit Python berechnen",
+            betreuung1: "Prof. Dr. Mümmelmann",
+            akademischerGradVonBetreuung1: "Dr. rer. nat. nat. Phd",
+            betreuung2: "Prof. Dr. Igeling",
+            akademischerGradVonBetreuung2: "Dr. rer. nat.",
+            arbeitAlsGruppenarbeit: true,
+            gruppenmitglied1: "Petra Breitfrosch",
+            matrikelnummerVonGruppenmitglied1: 9191991,
+            gruppenmitglied2: "Biene Jürgen",
+            matrikelnummerVonGruppenmitglied2: 2345678,
+            studentenSindAnHochschule: true,
+            studentenSindBeiFirma: false,
+            startVorlesungszeit: true,
+            startZum: new Date("2024-10-01"),
+            begruendungFuerDatum: "Weils Passt"
+        }) as AntragAnlage2Resource;
+        logger.info("Prefill AntragAnlage2 created: " + antragAnlage2);
+
+        const application = await antragZulassungService.createApplication({
+            creator: user.id?.toString(),
+            studentid: user.studentId,
+            department: "Informatik",
+            bachelor: true,
+            master: false,
+            userDetails: {
+                lastName: "Hans",
+                firstName: "Maulwurf",
+                street: "Hügelfeld 1",
+                city: "Berlin",
+                postalCode: "133749",
+                country: "Deutschland",
+                phone: "0123456789",
+            },
+            internshipCompleted: false,
+            recognitionApplied: false,
+            modulesCompleted: false,
+            modulesPending: false,
+            attachment2Included: false,
+            topicSuggestion: false,
+            date: new Date(),
+        }) as ApplicationResource;
+        logger.info("Prefill Application created: " + application);
+
+        return { user, AntragAnlage2: antragAnlage2, application };
+    } else {
+        logger.info("Prefill User already exists: " + existUser);
+        return null;
     }
-    return { behrens, protokolle };
 }
-  */

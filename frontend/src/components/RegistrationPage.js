@@ -1,6 +1,7 @@
 import React, {Component} from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
+import logger from "../logging/logger";
 
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
@@ -9,7 +10,9 @@ import * as navActions from '../actions/NavActions';
 import * as authActions from '../actions/AuthActions';
 
 const mapStateToProps = state => {
-    return state;
+    return { 
+        userExistsError: state.auth.userAlreadyExists 
+    }
 }
 
 class RegistrationPage extends Component{
@@ -26,6 +29,9 @@ class RegistrationPage extends Component{
             regPasswordRe: "",
             noMatch: false,
             incorrectEmailFormat: false,
+            incorrectSIDFormat: false,
+            incompleteForm: false,
+            incorrectPWFormat: false,
         }
 
         this.handleCancel = this.handleCancel.bind(this);
@@ -33,7 +39,13 @@ class RegistrationPage extends Component{
         this.handleRegistration = this.handleRegistration.bind(this);
         this.handleKeyPress = this.handleKeyPress.bind(this);
         this.checkEmail = this.checkEmail.bind(this);
+        this.checkSID = this.checkSID.bind(this);
         this.handleCheck = this.handleCheck.bind(this);
+        this.checkPWSecurity = this.checkPWSecurity.bind(this);
+    }
+
+    componentDidMount(){
+        logger.info("RegistrationPage.js mounted!");
     }
 
     handleKeyPress(e) {
@@ -58,24 +70,51 @@ class RegistrationPage extends Component{
         if(name === "regPassword" || name === "regPasswordRe"){
             this.setState(prevState => ({
                 [name]: value,
-                noMatch: false
+                noMatch: false,
+                incorrectPWFormat: false,
             }));
         }else if(name === "regEmail"){
             this.setState(prevState => ({
                 [name]: value,
                 incorrectEmailFormat: false,
             }));
+        }else if(name === "regMatrikel"){
+            this.setState(prevState => ({
+                [name]: value,
+                incorrectSIDFormat: false,
+            }))
         }else{
             this.setState({[name]: value});
         }
+        this.setState({incompleteForm: false});
     }
 
     checkEmail(email){
         const suffix = '@bht-berlin.de';
         return email.endsWith(suffix);
     }
+    checkSID(input) {
+        const regex = /^\d{6}$/;
+        return regex.test(input);
+    }
+    checkPWSecurity(password){
+        let passed = true;
+        if(password.length <= 7){
+            passed = false;
+        }
+        const regLower = /[a-z]/;
+        const regUpper = /[A-Z]/;
+        const regNumber = /[0-9]/;
+        const regSymbol = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/;
+        if(!regLower.test(password) || !regUpper.test(password) || !regNumber.test(password) || !regSymbol.test(password)){
+            passed = false;
+        }
+        return passed;
+    }
+    
 
     handleRegistration(e){
+        let hasFailed = false;
         e.preventDefault();
         const { regMatrikel, regName, regEmail, regAdmin, regPassword, regPasswordRe } = this.state;
         const { register } = this.props;
@@ -85,20 +124,37 @@ class RegistrationPage extends Component{
                 regPassword: "",
                 regPasswordRe: ""
             });
-            if(!this.checkEmail(regEmail)){
-                this.setState({
-                    incorrectEmailFormat: true,
-                    regEmail: ""
-                });
-                return;
-            }
-            return;
+            hasFailed = true;
+        }
+        if(!this.checkPWSecurity(regPassword)){
+            this.setState({
+                incorrectPWFormat: true,
+                regPassword: "",
+                regPasswordRe: ""
+            });
+            hasFailed = true;
         }
         if(!this.checkEmail(regEmail)){
             this.setState({
                 incorrectEmailFormat: true,
                 regEmail: ""
             });
+            hasFailed = true;
+        }
+        if(!this.checkSID(regMatrikel)){
+            this.setState({
+                incorrectSIDFormat: true,
+                regMatrikel: ""
+            })
+            hasFailed = true;
+        }
+        if(regMatrikel === "" || regName === "" || regEmail === "" || regPassword === ""){
+            this.setState({
+                incompleteForm: true,
+            })
+            hasFailed = true;
+        }
+        if(hasFailed){
             return;
         }
         console.log("Time to doxx the new user! Matrikel: "+regMatrikel+", Name: "+regName+", Email: "+regEmail+", Admin: "+regAdmin+", Password: "+regPassword);
@@ -106,16 +162,24 @@ class RegistrationPage extends Component{
     }
 
     render(){
+        let warnings = [];
+        if (this.state.noMatch) { warnings.push("Beide Passwörter müssen übereinstimmen!"); }
+        if (this.state.incorrectEmailFormat) { warnings.push("Falsches Emailformat (muss auf @bht-berlin.de enden)!"); }
+        if (this.state.incorrectSIDFormat) { warnings.push("Falsches Matrikelnr.-Format (muss eine sechsstellige Zahl sein)!"); }
+        if (this.props.userExistsError) { warnings.push("Ein Nutzer mit dieser Matrikelnummer existiert bereits!"); }
+        if (this.state.incompleteForm) { warnings.push("Das Formular ist unvollständig!"); }
+        if (this.state.incorrectPWFormat) { warnings.push("Das Passwort ist nicht sicher genug. (8 Zeichen, mindestens 1 Groß- und Kleinbuchstabe und Sonderzeichen."); }
         let warning;
-        if(this.state.noMatch && !this.state.incorrectEmailFormat){
-            warning = <div className="fMessage white"><p>Beide Passwörter müssen übereinstimmen!</p></div>
-        }else if(!this.state.noMatch && this.state.incorrectEmailFormat){
-            warning = <div className="fMessage white"><p>Falsches Emailformat (muss auf @bht-berlin.de enden)!</p></div>
-        }else if(this.state.noMatch && this.state.incorrectEmailFormat){
-            warning = <div className="fMessage white"><p>Beide Passwörter müssen übereinstimmen!</p><p>Falsches Emailformat (muss auf @bht-berlin.de enden)!</p></div>
+        if (warnings.length > 0) {
+            warning = (
+                <div className="fMessage white">
+                    {warnings.map((message, index) => <p key={index}>{message}</p>)}
+                </div>
+            );
         }else{
-            warning=<p></p>
+            warning = <p></p>;
         }
+
         return(
             <>
                 <style>

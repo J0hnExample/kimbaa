@@ -1,5 +1,6 @@
 import React, {createRef, Component} from "react";
 import { connect } from "react-redux";
+import logger from "../logging/logger";
 
 import * as navActions from '../actions/NavActions';
 import * as appActions from "../actions/ApplicationActions";
@@ -51,11 +52,14 @@ class MainApplicationPage extends Component{
         this.handleSemester = this.handleSemester.bind(this);
         this.handleDegree = this.handleDegree.bind(this);
         this.handleCheckChange = this.handleCheckChange.bind(this);
-        this.handleSave = this.handleSave.bind(this);
         this.handleOpen = this.handleOpen.bind(this);
         this.handleClose = this.handleClose.bind(this);
         this.handleDateChange = this.handleDateChange.bind(this);
         this.handleSaveReal = this.handleSaveReal.bind(this);
+    }
+
+    componentDidMount(){
+        logger.info("MainApplicationPage.js mounted!");
     }
 
     handleInputChange(e){
@@ -100,16 +104,11 @@ class MainApplicationPage extends Component{
         }
     }
 
-    handleSave(e){
-        const { appSemSummer, appMatrikel, appDepartment, appName, appEmail, appPhone, appStreet, appPlace, appPostal, appCourse, appMaster, appModuleRequirementsMet, appAttachment1, appAttachment2, appNoTopicProposition, appPracticalSemesterAcknowledgement, appPracticalSemesterDone} = this.state;
-        const { saveApplication } = this.props;
-        saveApplication(appSemSummer, appMatrikel, appDepartment, appName, appEmail, appPhone, appStreet, appPlace, appPostal, appCourse, appMaster, appModuleRequirementsMet, appAttachment1, appAttachment2, appNoTopicProposition, appPracticalSemesterDone, appPracticalSemesterAcknowledgement);
-    }
 
     handleSaveReal(e){
-        const{appMatrikel, appDepartment, appBachelor, appMaster, appPracticalSemesterDone, appPracticalSemesterAcknowledgement, appModuleRequirementsMet, appAttachment1, appAttachment2, appNoTopicProposition } =  this.state;
+        const{appMatrikel, appDepartment, appBachelor, appMaster, appPracticalSemesterDone, appPracticalSemesterAcknowledgement, appModuleRequirementsMet, appAttachment1, appAttachment2, appNoTopicProposition, dateFrom, dateTo } =  this.state;
         const{saveApplicationReal} = this.props;
-        saveApplicationReal(appMatrikel, appDepartment, appBachelor, appMaster, appPracticalSemesterDone, appPracticalSemesterAcknowledgement, appModuleRequirementsMet, appAttachment1, appAttachment2, appNoTopicProposition);
+        saveApplicationReal(appMatrikel, appDepartment, appBachelor, appMaster, appPracticalSemesterDone, appPracticalSemesterAcknowledgement, appModuleRequirementsMet, appAttachment1, appAttachment2, appNoTopicProposition, dateFrom, dateTo );
     }
     handleClose(){
         this.dialogRef.current.close();
@@ -260,7 +259,6 @@ class MainApplicationPage extends Component{
 
 const mapDispatchToProps = dispatch => bindActionCreators({
     moveToLanding: navActions.getNavLandingAction,
-    saveApplication: appActions.saveApplication,
     saveApplicationReal: appActions.saveApplicationAction,
 }, dispatch)
 

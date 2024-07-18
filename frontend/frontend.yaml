@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kimbaa-frontend
+  labels:
+    app: kimbaa-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kimbaa-frontend
+  template:
+    metadata:
+      labels:
+        app: kimbaa-frontend
+    spec:
+      containers:
+      - name: kimbaa-frontend
+        image: kimbaa-frontend #TODO: fix image
+        ports:
+        - containerPort: 3000
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: kimbaa-frontend
+spec:
+  selector:
+    app.kubernetes.io/name: kimbaa-frontend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: frontend-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx-example #TODO: fix ingress and check paths
+  rules:
+  - http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: kimbaa-frontend
+            port:
+              number: 80

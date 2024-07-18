@@ -140,6 +140,17 @@ h1, h2, h3 {
 
 .fLanding{
   margin-left: 80px;
+  color: #ffffff;
+}
+.fLandingModUpload{
+  display: flex;
+  margin-left: 10%;
+  margin-right: 10%;
+  margin-top: 10%;
+  padding: 2%;
+  border-radius: 4px;
+  border: none;
+  background-color: var(--blue);
 }
 
 .hauptantrag{
@@ -203,4 +214,8 @@ h1, h2, h3 {
   background-color: var(--yellow);
   border: none;
   border-radius: 20px;
+}
+
+.whiteText{
+  color: white;
 }

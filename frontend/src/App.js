@@ -1,14 +1,15 @@
 import React, {Component} from 'react';
 import './App.css';
 import { connect } from 'react-redux';
+import logger from './logging/logger';
 
 import TopMenu from './components/TopMenu';
 import LandingPage from './components/LandingPage';
 import LoginPage from './components/LoginPage';
 import RegistrationPage from './components/RegistrationPage';
 import MainApplicationPage from './components/MainApplicationPage';
+import MainApplicationEditPage from './components/MainApplicationEditPage';
 import UserEditPage from './components/UserEditPage';
-import PlayTestApplicationPage from './components/PlayTestApplicationPage';
 
 const mapStateToProps = state => {
   return {
@@ -17,6 +18,11 @@ const mapStateToProps = state => {
 }
 
 class App extends Component{
+
+  componentDidMount(){
+    logger.info("App.js mounted!");
+  }
+
   render(){
     const page = this.props.page;
     let workspace;
@@ -37,8 +43,8 @@ class App extends Component{
       case "userEdit":
         workspace = <UserEditPage />
         break;
-      case "playTestPage":
-        workspace = <PlayTestApplicationPage />;
+      case "applicationEdit":
+        workspace = <MainApplicationEditPage />
         break;
       default:
         workspace = <LoginPage />

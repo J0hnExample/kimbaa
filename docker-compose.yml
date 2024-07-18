@@ -1,44 +1,42 @@
-
+---
+version: "3"
 
 services:
-
   frontend:
     build:
       context: frontend
-    develop:
-      watch:
-        - action: sync
-          path: ./frontend
-          target: /frontend #TODO target path
-          ignore:
-            - ./frontend/package.json
-        - action: rebuild
-          path: ./backend/package.json
     ports:
-      - 3000:3000
-
+      - "3000:3000"
+    environment:
+      - HOSTNAME=localhost
+      - HTTP_PORT=3000
+      - HTTPS_PORT=3443
+      - HTTPS=true
+      - BACKEND_URL=https://localhost:3443 # oder die entsprechende URL
+    networks:
+      - loki
 
   backend:
     build:
       context: backend
-    develop:
-      watch:
-        - action: sync
-          path: ./backend
-          target: /backend #TODO target path
-          ignore:
-            - ./backend/package.json
-            - ./backend/tests
-            - ./backend/testConfig
-        - action: rebuild
-          path: ./backend/package.json
     ports:
-      - 8081:3000
+      - "8081:3000"
+      - "3443:3443"
     environment:
       - DB_CONNECTION_STRING=mongodb://root:example@mongo:27017/
       - HTTP_PORT=3000
+      - FRONTEND_PORT=3000
+      - USE_SSL=true
+      - HTTPS_PORT=3443
+      - SSL_KEY_FILE=/backend/cert/private.key
+      - SSL_CRT_FILE=/backend/cert/public.crt
+    volumes:
+      - ./backend:/backend
+      - ./backend/cert:/backend/cert
     depends_on:
       - mongo
+    networks:
+      - loki
 
   mongo:
     container_name: mongo-db
@@ -48,19 +46,8 @@ services:
       - '27017:27017'
     env_file:
       - mongodb/mongo-dev.env
-
-#  mongo-express:
-#    image: mongo-express
-#    restart: always
-#    ports:
-#      - 8081:8081
-#    environment:
-#      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-#      ME_CONFIG_MONGODB_ADMINPASSWORD: example
-#      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
-#      ME_CONFIG_BASICAUTH: false
-
+    networks:
+      - loki
 
 networks:
-  kimbaa:
-    name: kimbaa
+  loki:

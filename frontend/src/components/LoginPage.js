@@ -1,5 +1,6 @@
 import React, {Component} from "react";
 import { connect } from "react-redux";
+import logger from "../logging/logger";
 
 import * as navActions from '../actions/NavActions';
 import * as authActions from '../actions/AuthActions';
@@ -25,6 +26,10 @@ class LandingDemo extends Component{
         this.getRegistrationForm = this.getRegistrationForm.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleKeyPress = this.handleKeyPress.bind(this);
+    }
+
+    componentDidMount(){
+        logger.info("LoginPage.js mounted!");
     }
 
     doLogin(){

@@ -3,26 +3,32 @@ import app from "../../src/app";
 import * as userService from "../../src/services/UserService";
 import * as antragZulassungService from "../../src/services/AntragZulassungService";
 import { User } from '../../src/model/UserModel';
+import { performAuthentication, supertestWithAuth } from "../supertestWithAuth";
+import { UserResource } from "../../src/Resources";
+
+let user: UserResource;
+let user2: UserResource;
+
 beforeEach(async () => {
-    const user = new User({
-        name: "DerOtto",
-        password: "test",
-        admin: false,
+    await User.deleteMany({});
+
+    user = await userService.createUser({
+        name: "Tim",
+        password: "12345bcdABCD..;,.",
+        admin: true,
         studentId: "666456",
         email: "test@bht-berlin.de",
-        course: "6",
+        course: "Medieninformatik",
     });
-    await user.save();
-    const user2 = new User({
-        name: "DerOtto",
-        password: "test",
+    user2 = await userService.createUser({
+        name: "Tom",
+        password: "12345bcdABCD..;,.",
         admin: false,
-        studentId: "999999",
+        studentId: "666995",
         email: "test2@bht-berlin.de",
-        course: "6",
-    });
-    await user.save();
-    const application = await antragZulassungService.createApplication({
+        course: "Informetrik",
+    })
+    await antragZulassungService.createApplication({
         creator: user2.id,
         studentid: user2.studentId,
         userDetails: {
@@ -35,11 +41,14 @@ beforeEach(async () => {
             phone: "0123456789",
         },
     });
+
+    await performAuthentication("666456", "12345bcdABCD..;,.");
 });
+
 // Test: Es existiert kein Antrag, also sind noch keine UserDetails eingetragen und es werden Antragsdaten gesendet.
-test("PUT /antragzulassung/:identifier - success with no existing application", async () => {
-    const testee = supertest(app);
-    const user = await userService.getOneUser({ studentId: "666456" });
+test("PUT /api/antragzulassung/:identifier - success with no existing application", async () => {
+    const token = await performAuthentication("666456", "12345bcdABCD..;,.");
+    const testee = supertestWithAuth(app);
 
     // Stellen Sie sicher, dass kein Antrag für diesen Benutzer existiert
     let application = await antragZulassungService.getApplicationById(user.id!);
@@ -69,7 +78,7 @@ test("PUT /antragzulassung/:identifier - success with no existing application", 
         date: new Date(),
     };
 
-    const res = await testee.put("/api/antragzulassung/666456").send(newApplicationResource);
+    const res = await testee.put(`/api/antragzulassung/666456`).send(newApplicationResource);
 
     expect(res.status).toBe(200);
 
@@ -80,28 +89,26 @@ test("PUT /antragzulassung/:identifier - success with no existing application", 
 });
 
 // Test: Es existieren schon eingetragene UserDetails und es werden Antragsdaten ausgefüllt und gesendet.
-test("PUT /antragzulassung/:identifier - success with existing application", async () => {
-    const testee = supertest(app);
-    const user2 = await userService.getOneUser({ studentId: "666456" });
-
+test("PUT /api/antragzulassung/:identifier - success with existing application", async () => {
+    const token = await performAuthentication("666456", "12345bcdABCD..;,.");
+    const testee = supertestWithAuth(app);
 
     const newApplicationResource = {
-            department: "Informatik",
-            bachelor: true,
-            master: false,
-            internshipCompleted: false,
-            recognitionApplied: false,
-            internshipCompletedFrom: new Date(), // Praxisphase abgeleistet von
-            internshipCompletedTo: new Date(), // Praxisphase abgeleistet bis
-            modulesCompleted: false,
-            modulesPending: true,
-            attachment2Included: false,
-            topicSuggestion: false,
-            date: new Date(),
-        
+        department: "Informatik",
+        bachelor: true,
+        master: false,
+        internshipCompleted: false,
+        recognitionApplied: false,
+        internshipCompletedFrom: new Date(), // Praxisphase abgeleistet von
+        internshipCompletedTo: new Date(), // Praxisphase abgeleistet bis
+        modulesCompleted: false,
+        modulesPending: true,
+        attachment2Included: false,
+        topicSuggestion: false,
+        date: new Date(),
     };
 
-    const res = await testee.put("/api/antragzulassung/666456").send(newApplicationResource);
+    const res = await testee.put(`/api/antragzulassung/666995`).send(newApplicationResource);
 
     expect(res.status).toBe(200);
 
@@ -112,20 +119,22 @@ test("PUT /antragzulassung/:identifier - success with existing application", asy
     expect(application?.master).toBe(false);
     expect(application?.internshipCompleted).toBe(false);
     expect(application?.recognitionApplied).toBe(false);
-    expect(application?.internshipCompletedFrom).toBeTruthy;
-    expect(application?.internshipCompletedTo).toBeTruthy;
+    expect(application?.internshipCompletedFrom).toBeTruthy();
+    expect(application?.internshipCompletedTo).toBeTruthy();
     expect(application?.modulesCompleted).toBe(false);
     expect(application?.modulesPending).toBe(true);
     expect(application?.attachment2Included).toBe(false);
     expect(application?.topicSuggestion).toBe(false);
-    expect(application?.date).toBeTruthy;
+    expect(application?.date).toBeTruthy();
     // Hier können Sie weitere Überprüfungen hinzufügen, um sicherzustellen, dass die Antragsdaten korrekt aktualisiert wurden
 });
 
 // Test: Es wird mit GET Antragsinformationen abgerufen
-test("GET /antragzulassung/:identifier - success", async () => {
-    const testee = supertest(app);
-    const user = await userService.getOneUser({ studentId: "666456" });
+test("GET /api/antragzulassung/:identifier - success", async () => {
+    const token = await performAuthentication("666456", "12345bcdABCD..;,.");
+    const testee = supertestWithAuth(app);
+    
+
     const applicationnew = await antragZulassungService.createApplication({
         creator: user.id,
         studentid: user.studentId,
@@ -156,7 +165,10 @@ test("GET /antragzulassung/:identifier - success", async () => {
     const application = await antragZulassungService.getApplicationById(user.id!);
     expect(application).not.toBeNull();
 
-    const res = await testee.get("/api/antragzulassung/666456");
+    // Ensure that the testee object is defined
+    expect(testee).toBeDefined();
+
+    const res = await testee!.get(`/api/antragzulassung/666456`);
 
     expect(res.status).toBe(200);
     expect(applicationnew?.department).toBe("Informatik");
@@ -164,13 +176,13 @@ test("GET /antragzulassung/:identifier - success", async () => {
     expect(applicationnew?.master).toBe(false);
     expect(applicationnew?.internshipCompleted).toBe(false);
     expect(applicationnew?.recognitionApplied).toBe(false);
-    expect(applicationnew?.internshipCompletedFrom).toBeTruthy;
-    expect(applicationnew?.internshipCompletedTo).toBeTruthy;
+    expect(applicationnew?.internshipCompletedFrom).toBeTruthy();
+    expect(applicationnew?.internshipCompletedTo).toBeTruthy();
     expect(applicationnew?.modulesCompleted).toBe(false);
     expect(applicationnew?.modulesPending).toBe(true);
     expect(applicationnew?.attachment2Included).toBe(false);
     expect(applicationnew?.topicSuggestion).toBe(false);
-    expect(applicationnew?.date).toBeTruthy;
+    expect(applicationnew?.date).toBeTruthy();
 
     // Hier können Sie weitere Überprüfungen hinzufügen, um sicherzustellen, dass die Antragsinformationen korrekt abgerufen wurden
 });

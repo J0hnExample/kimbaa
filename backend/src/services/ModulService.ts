@@ -11,9 +11,10 @@ export async function getAlleModule(studentId: string): Promise<ModulResource[]>
     logger.info("Modul.Service.getAlleModule wird gestartet");
     const modulList = await ModulList.findOne({ studentId: studentId }).exec();
     const modulListId = modulList?.id;
+    logger.info("modulListId: " + modulListId);
     if (!modulList) {
-        logger.info("getAlleModule: keine gültige ID");
-        throw new Error("getAlleModule: keine gültige ID");
+        logger.info("getAlleModule: keine gültige ID" + modulListId + " " + studentId);
+        throw new Error("getAlleModule: keine gültige ID" + modulListId + " " + studentId);
     } else {
         logger.info("modulListId: " + modulListId);
         const alleModule = await Modul.find({ modulList: modulListId }).exec();
@@ -161,7 +162,28 @@ export async function updateModulesByModuleNameAndUserId(modules: ModulResource[
         }
     }
 }
+export async function updateModulesByModuleNumberAndUserId(modules: ModulResource[]): Promise<void> {
+    for (const module of modules) {
+        try {
+            const existingModule = await Modul.findOne({
+                creator: module.creator,
+                modulnumber: module.modulnumber,
+            }).exec();
 
+            if (!existingModule) {
+                throw new Error(`Modul mit Modulnummer "${module.modulnumber}" und Ersteller-ID ${module.creator} nicht gefunden.`);
+            }
+
+            // Hier kannst du den Solved-Wert aktualisieren
+            existingModule.solved = module.solved;
+
+            // Speichere die Änderungen
+            await existingModule.save();
+        } catch (error) {
+            console.error(`Fehler beim Aktualisieren des Moduls mit Modulname "${module.modulnumber}": ${error}`);
+        }
+    }
+}
 export async function calculateModuleSummary(userId: string): Promise<{
     credits: number;
     allrequired: boolean;
