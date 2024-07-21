@@ -67,12 +67,19 @@ class LandingPage extends Component {
 
     render(){
         let name = this.props.userResource && this.props.userResource.name ? this.props.userResource.name : "John Default";
-        let yourApplication = <></>;
+        let yourApplication =   <Card style={{ width: '18rem' }} className="card whiteText">
+                                    <Card.Body>
+                                        <Card.Title>
+                                            <Button className="cardButton" onClick={this.props.makeApplication}> Neuen Antrag Anlegen</Button>
+                                        </Card.Title>
+                                        <Card.Text>Hier kannst du einen neuen Bachelorantrag erstellen!</Card.Text>
+                                    </Card.Body>
+                                </Card>;
         let application = typeof this.props.application === 'string' ? JSON.parse(this.props.application) : this.props.application;
         if(application){
             yourApplication =   <Card style={{ width: '18rem' }} className="card whiteText">
                                     <Card.Body>
-                                        <Card.Title>
+                                        <Card.Title className="spaceTop">
                                             {this.state.course}
                                         </Card.Title>
                                         <Card.Text >
@@ -90,14 +97,6 @@ class LandingPage extends Component {
                     <p> Schön, dich zu sehen, {name}!</p>
                 </Container>
                 <Container className="fGrid">
-                    <Card style={{ width: '18rem' }} className="card whiteText">
-                        <Card.Body>
-                            <Card.Title>
-                                <Button className="cardButton" onClick={this.props.makeApplication}> Neuen Antrag Anlegen</Button>
-                            </Card.Title>
-                            <Card.Text>Hier kannst du einen neuen Bachelorantrag erstellen!</Card.Text>
-                        </Card.Body>
-                    </Card>
                     <Card style={{ width: '18rem' }} className="card whiteText">
                         <Card.Body>
                             <div className="fLandingModUpload">
