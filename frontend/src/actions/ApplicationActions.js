@@ -138,6 +138,7 @@ export const refreshUE = (studentId) => async (dispatch) => {
         Cookies.set('currentPage', 'landing', { sameSite: 'Strict' });
         dispatch(getRefreshResourceSuccess(resource));
     } catch (err) {
+        Cookies.set('currentPage', 'landing', { sameSite: 'Strict' });
         dispatch(getRefreshResourceFailure(err));
         throw err; // Ensure the error is thrown to be caught in handleSaveUser
     }
@@ -373,14 +374,13 @@ export const PUT_USERDETAILS_APPLICATION_SUCCESS = "PUT_USERDETAILS_APPLICATION_
 
 function getPutUserdetailsApplicationPending(){ return { type: PUT_USERDETAILS_APPLICATION_PENDING } }
 function getPutUserdetailsApplicationFail(err){ return { type: PUT_USERDETAILS_APPLICATION_FAILURE, err: err } }
-function getPutUserdetailsApplicationSuccess(){ return { type: PUT_USERDETAILS_APPLICATION_SUCCESS, payload: 'landing' } }
+function getPutUserdetailsApplicationSuccess(){ return { type: PUT_USERDETAILS_APPLICATION_SUCCESS } }
 
 export function saveUserdetailsApplicationAction(studentId, firstName, lastName, Phone, Street, Place, Postal ){
     return dispatch => {
         dispatch(getPutUserdetailsApplicationPending());
         saveUserdetailsApplication(studentId,  firstName, lastName, Phone, Street, Place, Postal )
             .then(() => {
-                Cookies.set('currentPage', 'Landing', { sameSite: 'Strict' })
                 dispatch(getPutUserdetailsApplicationSuccess())
             })
             .catch(err => {
@@ -391,7 +391,7 @@ export function saveUserdetailsApplicationAction(studentId, firstName, lastName,
 
 function saveUserdetailsApplication( studentId, firstName, lastName, Phone, Street, Place, Postal ){
     const ApplicationForm = {
-        studentid: studentId, // Matrikelnummer
+        studentId: studentId, // Matrikelnummer
         userDetails: 
         { 
             lastName: lastName, 

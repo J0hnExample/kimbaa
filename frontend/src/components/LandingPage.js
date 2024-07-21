@@ -97,6 +97,7 @@ class LandingPage extends Component {
                     <p> Schön, dich zu sehen, {name}!</p>
                 </Container>
                 <Container className="fGrid">
+                    {yourApplication}
                     <Card style={{ width: '18rem' }} className="card whiteText">
                         <Card.Body>
                             <div className="fLandingModUpload">
@@ -115,7 +116,6 @@ class LandingPage extends Component {
                             </Card.Text>
                         </Card.Body>
                     </Card>
-                    {yourApplication}
                 </Container>
             </>
         );
