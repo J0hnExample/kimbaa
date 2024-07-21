@@ -30,12 +30,12 @@ class UserEditPage extends Component{
             uEUserId: userResource._id ? userResource._id : userResource.id,
             uEstudentId: userResource.studentId ? userResource.studentId : "",
             uEName: userResource.name ? userResource.name : "",
-            uEStreet: applicationreal.userDetails ? applicationreal.userDetails.street ? applicationreal.userDetails.street : "" : "",
-            uEPlace: applicationreal.userDetails ? applicationreal.userDetails.city ? applicationreal.userDetails.city : "" : "",
-            uEPostal: applicationreal.userDetails ? applicationreal.userDetails.postalCode ? applicationreal.userDetails.postalCode : "" : "",
+            uEStreet: applicationreal?.userDetails?.street || "",
+            uEPlace: applicationreal?.userDetails?.city || "",
+            uEPostal: applicationreal?.userDetails?.postalCode || "",
             uEEmail: userResource.email ? userResource.email : "",
             uECourse: userResource.course ? userResource.course : "",
-            uEPhone: applicationreal.userDetails ? applicationreal.userDetails.phone ? applicationreal.userDetails.phone : "" : "",
+            uEPhone: applicationreal?.userDetails?.phone || "",
         }
 
         this.handleInputChange = this.handleInputChange.bind(this);
@@ -75,7 +75,7 @@ class UserEditPage extends Component{
         try {
             // Await saveUser to ensure it completes before calling refreshResource
             await saveUserAction(uEstudentId, uEName, uEEmail, uECourse, uEUserId);
-            await this.props.updateUserdetails(uEstudentId , uEStreet, uEPlace, uEPostal,uEPhone, firstName, lastName);
+            await this.props.updateuser(uEstudentId , firstName, lastName ,uEPhone , uEStreet, uEPlace, uEPostal);
             await refreshUE(uEstudentId);
         } catch (error) {
             console.error("Error saving user and refreshing resource:", error);
@@ -183,6 +183,7 @@ const mapDispatchToProps = dispatch => bindActionCreators({
     refreshUE: appActions.refreshUE,
     updateUserdetails: appActions.putUserdetailsAction,
     getApplication: appActions.getApplicationAction,
+    updateuser : appActions.saveUserdetailsApplicationAction,
 }, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(UserEditPage);

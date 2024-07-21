@@ -361,3 +361,65 @@ export async function fetchPointStatus(studentId){
     }
     return await response.json();
 }
+
+
+
+
+
+
+export const PUT_USERDETAILS_APPLICATION_PENDING = "PUT_USERDETAILS_APPLICATION_PENDING";
+export const PUT_USERDETAILS_APPLICATION_FAILURE = "PUT_USERDETAILS_APPLICATION_FAILURE";
+export const PUT_USERDETAILS_APPLICATION_SUCCESS = "PUT_USERDETAILS_APPLICATION_SUCCESS";
+
+function getPutUserdetailsApplicationPending(){ return { type: PUT_USERDETAILS_APPLICATION_PENDING } }
+function getPutUserdetailsApplicationFail(err){ return { type: PUT_USERDETAILS_APPLICATION_FAILURE, err: err } }
+function getPutUserdetailsApplicationSuccess(){ return { type: PUT_USERDETAILS_APPLICATION_SUCCESS, payload: 'landing' } }
+
+export function saveUserdetailsApplicationAction(studentId, firstName, lastName, Phone, Street, Place, Postal ){
+    return dispatch => {
+        dispatch(getPutUserdetailsApplicationPending());
+        saveUserdetailsApplication(studentId,  firstName, lastName, Phone, Street, Place, Postal )
+            .then(() => {
+                Cookies.set('currentPage', 'Landing', { sameSite: 'Strict' })
+                dispatch(getPutUserdetailsApplicationSuccess())
+            })
+            .catch(err => {
+                dispatch(getPutUserdetailsApplicationFail(err))
+            })
+    }
+}
+
+function saveUserdetailsApplication( studentId, firstName, lastName, Phone, Street, Place, Postal ){
+    const ApplicationForm = {
+        studentid: studentId, // Matrikelnummer
+        userDetails: 
+        { 
+            lastName: lastName, 
+            firstName: firstName , 
+            street: Street, 
+            city: Place, 
+            postalCode: Postal , 
+            //"country": "string", 
+            phone: Phone 
+        }
+
+    }
+
+    const requestOptions = {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(ApplicationForm),
+        credentials: 'include'
+    }
+
+    console.log("fetching:" + BACKEND_URL + '/api/antragzulassung/' + studentId)
+    return fetch(BACKEND_URL + '/api/antragzulassung/' + studentId, requestOptions)
+        .then(response => {
+            if(!response.ok){
+                throw new Error('Error while saving Userdetails');
+            }
+            return response.json();
+        })
+}
