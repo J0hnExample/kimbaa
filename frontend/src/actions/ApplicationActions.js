@@ -335,7 +335,7 @@ function putUserdetails( studentId, street, city, postalCode, phone , nameFirst,
         credentials: 'include'
     }
 
-    console.log("fetching:" + BACKEND_URL + '/api/userdetails/' + studentId)
+    console.log("fetching:" + BACKEND_URL + '/api/userdetails/' + Id)
     return fetch(BACKEND_URL + '/api/userdetails/' + studentId, requestOptions)
         .then(response => {
             if(!response.ok){
@@ -346,7 +346,7 @@ function putUserdetails( studentId, street, city, postalCode, phone , nameFirst,
 }
 
 
-export async function fetchPointStatus(studentId){
+export async function fetchPointStatus(userId){
     const requestOptions = {
         method: 'GET',
         headers: {
@@ -355,8 +355,8 @@ export async function fetchPointStatus(studentId){
         credentials: 'include'
     };
 
-    logger.info("fetching:" + BACKEND_URL + '/api/modul/summary/' + studentId);
-    const response = await fetch(BACKEND_URL + '/api/modul/summary/' + studentId, requestOptions);
+    logger.info("fetching:" + BACKEND_URL + '/api/modul/summary/' + userId);
+    const response = await fetch(BACKEND_URL + '/api/modul/summary/' + userId, requestOptions);
     if (!response.ok) {
         logger.info("Request for Module Point Summary Failed (ApplicationActions.js)");
     }
