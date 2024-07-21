@@ -43,7 +43,7 @@ class MainApplicationEditPage extends Component{
             appModuleRequirementsMet: false,
             appModuleViable: false,
             appAttachment1: false,
-            appAttachment2: applicationreal.attachment2Included ? applicationreal.attachment2Include : false,
+            appAttachment2: applicationreal.attachment2Included ? applicationreal.attachment2Included : false,
             appNoTopicProposition: applicationreal.topicSuggestion ? applicationreal.topicSuggestion : false,
             appPracticalSemesterDone:  applicationreal.internshipCompleted ? applicationreal.internshipCompleted : false,
             appPracticalSemesterAcknowledgement: applicationreal.recognitionApplied ? applicationreal.recognitionApplied : false,
@@ -134,13 +134,12 @@ class MainApplicationEditPage extends Component{
     }
 
     handleSave(e){
-        const{appMatrikel, appName, appDepartment, appBachelor, appMaster, appPracticalSemesterDone, appPracticalSemesterAcknowledgement, appModuleRequirementsMet, appAttachment1, appAttachment2, appNoTopicProposition, dateFrom, dateTo
+        const{appMatrikel, appName, appDepartment, appBachelor, appMaster, appPracticalSemesterDone, appPracticalSemesterAcknowledgement, appModuleRequirementsMet, appAttachment1, appAttachment2, appNoTopicProposition
             , appPhone, appStreet, appPlace, appPostal,
          } =  this.state;
         const{saveApplication} = this.props;
         const [firstName, lastName] = this.splitName(appName);
-        this.props.updateUserdetails(appMatrikel , appStreet, appPlace, appPostal, appPhone, firstName, lastName );
-        saveApplication(appMatrikel, appDepartment, appBachelor, appMaster, appPracticalSemesterDone, appPracticalSemesterAcknowledgement, appModuleRequirementsMet, appAttachment1, appAttachment2, appNoTopicProposition, dateFrom, dateTo );
+        saveApplication(appMatrikel, appDepartment, appBachelor, appMaster, appPracticalSemesterDone, appPracticalSemesterAcknowledgement, appModuleRequirementsMet, appAttachment1, appAttachment2, appNoTopicProposition , firstName, lastName, appPhone, appStreet, appPlace, appPostal );
     }
     handleClose(){
         this.dialogRef.current.close();

@@ -11,10 +11,10 @@ function getSaveApplicationPending(){ return { type: APPLICATION_PENDING } }
 function getSaveApplicationFail(err){ return { type: APPLICATION_FAILURE, err: err } }
 function getSaveApplicationSuccess(){ return { type: APPLICATION_SUCCESS, payload: 'landing' } }
 
-export function saveApplicationAction(studentId, department,bachelor, master, practicalDone, practicalAcknowlegded, reqMet, att1, att2, noTopicProposition  ){
+export function saveApplicationAction(studentId, department,bachelor, master, practicalDone, practicalAcknowlegded, reqMet, att1, att2, noTopicProposition, firstName, lastName, Phone, Street, Place, Postal ){
     return dispatch => {
         dispatch(getSaveApplicationPending());
-        saveApplication(studentId, department, bachelor, master, practicalDone, practicalAcknowlegded, reqMet, att1, att2, noTopicProposition)
+        saveApplication(studentId, department, bachelor, master, practicalDone, practicalAcknowlegded, reqMet, att1, att2, noTopicProposition, firstName, lastName, Phone, Street, Place, Postal )
             .then(() => {
                 Cookies.set('currentPage', 'Landing', { sameSite: 'Strict' })
                 dispatch(getSaveApplicationSuccess())
@@ -25,13 +25,25 @@ export function saveApplicationAction(studentId, department,bachelor, master, pr
     }
 }
 
-function saveApplication( studentId, department, bachelor, master, practicalDone, practicalAcknowlegded, reqMet, att1, att2, noTopicProposition ){
+function saveApplication( studentId, department, bachelor, master, practicalDone, practicalAcknowlegded, reqMet, att1, att2, noTopicProposition , firstName, lastName, Phone, Street, Place, Postal ){
     const ApplicationForm = {
         studentid: studentId, // Matrikelnummer
         department: department, // Fachbereich
         bachelor: bachelor, // Bachelor
         master: master, // Master
+        userDetails: 
+        { 
+            lastName: lastName, 
+            firstName: firstName , 
+            street: Street, 
+            city: Place, 
+            postalCode: Postal , 
+            //"country": "string", 
+            phone: Phone 
+        },
         internshipCompleted: practicalDone, // Praxisphase abgeschlossen
+        //internshipCompletedFrom: "", 
+        //internshipCompletedTo: "",
         recognitionApplied: practicalAcknowlegded, // Anerkennung beantragt
         modulesCompleted: reqMet, // Module abgeschlossen
         modulesPending: att1, // Module ausstehend

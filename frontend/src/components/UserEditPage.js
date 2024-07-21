@@ -49,12 +49,6 @@ class UserEditPage extends Component{
         logger.info("UserEditPage.js mounted!");
     }
 
-    componentDidUpdate(prevProps) {
-        if (prevProps.application !== this.props.application && this.props.application) {
-            console.log('New application data received:', this.props.application);
-        }
-    }
-
     splitName(name) {
         const parts = name.split(' ');
         if (parts.length > 2) {
@@ -167,6 +161,7 @@ class UserEditPage extends Component{
                                 <input className="textInput tiNarrow" type="text" placeholder="Ort" name="uEPlace" value={this.state.uEPlace} onChange={this.handleInputChange} />
                             </div>
                             <input className="textInput tiWide" type="text" placeholder="Email" name="uEEmail" value={this.state.uEEmail} onChange={this.handleInputChange} />
+                            <input className="textInput tiWide" type="text" placeholder="Phone" name="uEPhone" value={this.state.uEPhone} onChange={this.handleInputChange} />
                             <input className="textInput tiWide" type="text" placeholder="Studiengang" name="uECourse" value={this.state.uECourse} onChange={this.handleInputChange} />
                         </Form.Group>
                         <Form.Group controlId="SubmitOrLeave" className="spaceTop spaceBottom">
