@@ -17,7 +17,7 @@ export function saveApplicationAction(studentId, department,bachelor, master, pr
         dispatch(getSaveApplicationPending());
         saveApplication(studentId, department, bachelor, master, practicalDone, practicalAcknowlegded, reqMet, att1, att2, noTopicProposition, firstName, lastName, Phone, Street, Place, Postal )
             .then(() => {
-                Cookies.set('currentPage', 'Landing', { sameSite: 'Strict' })
+                Cookies.set('currentPage', 'landing', { sameSite: 'Strict' })
                 dispatch(getSaveApplicationSuccess())
             })
             .catch(err => {
@@ -141,6 +141,7 @@ export const refreshUE = (studentId) => async (dispatch) => {
         Cookies.set('currentPage', 'landing', { sameSite: 'Strict' });
         dispatch(getRefreshResourceSuccess(resource));
     } catch (err) {
+        Cookies.set('currentPage', 'landing', { sameSite: 'Strict' });
         dispatch(getRefreshResourceFailure(err));
         throw err; // Ensure the error is thrown to be caught in handleSaveUser
     }
@@ -350,7 +351,7 @@ function putUserdetails( studentId, street, city, postalCode, phone , nameFirst,
 }
 
 
-export async function fetchPointStatus(studentId){
+export async function fetchPointStatus(userId){
     const requestOptions = {
         method: 'GET',
         headers: {
@@ -359,8 +360,8 @@ export async function fetchPointStatus(studentId){
         credentials: 'include'
     };
 
-    logger.info("fetching:" + BACKEND_URL + '/api/modul/summary/' + studentId);
-    const response = await fetch(BACKEND_URL + '/api/modul/summary/' + studentId, requestOptions);
+    logger.info("fetching:" + BACKEND_URL + '/api/modul/summary/' + userId);
+    const response = await fetch(BACKEND_URL + '/api/modul/summary/' + userId, requestOptions);
     if (!response.ok) {
         logger.info("Request for Module Point Summary Failed (ApplicationActions.js)");
     }
@@ -378,7 +379,7 @@ export const PUT_USERDETAILS_APPLICATION_SUCCESS = "PUT_USERDETAILS_APPLICATION_
 
 function getPutUserdetailsApplicationPending(){ return { type: PUT_USERDETAILS_APPLICATION_PENDING } }
 function getPutUserdetailsApplicationFail(err){ return { type: PUT_USERDETAILS_APPLICATION_FAILURE, err: err } }
-function getPutUserdetailsApplicationSuccess(){ return { type: PUT_USERDETAILS_APPLICATION_SUCCESS, payload: 'landing' } }
+function getPutUserdetailsApplicationSuccess(){ return { type: PUT_USERDETAILS_APPLICATION_SUCCESS } }
 
 //updated die userdetails über die application route, was verlässlicher ist wenn der User noch keinen antrag erstellt hat
 export function saveUserdetailsApplicationAction(studentId, firstName, lastName, Phone, Street, Place, Postal ){
@@ -386,7 +387,6 @@ export function saveUserdetailsApplicationAction(studentId, firstName, lastName,
         dispatch(getPutUserdetailsApplicationPending());
         saveUserdetailsApplication(studentId,  firstName, lastName, Phone, Street, Place, Postal )
             .then(() => {
-                Cookies.set('currentPage', 'Landing', { sameSite: 'Strict' })
                 dispatch(getPutUserdetailsApplicationSuccess())
             })
             .catch(err => {
@@ -398,6 +398,7 @@ export function saveUserdetailsApplicationAction(studentId, firstName, lastName,
 function saveUserdetailsApplication( studentId, firstName, lastName, Phone, Street, Place, Postal ){
     const ApplicationForm = {
         studentid: studentId, // Matrikelnummer
+
         userDetails: 
         { 
             lastName: lastName, 

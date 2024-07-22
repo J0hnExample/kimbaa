@@ -38,6 +38,12 @@ class LandingPage extends Component {
 
         this.props.getApplication(appMatrikel);
         logger.info("LandingPage.js mounted!");
+        setTimeout(() => {
+            if (this.props.application === null) {
+                logger.info("Reloading application");
+                this.props.getApplication(appMatrikel);
+            }
+        }, 5000);
     }
 
     componentDidUpdate(prevProps) {
@@ -98,6 +104,7 @@ class LandingPage extends Component {
                     <p> Schön, dich zu sehen, {name}!</p>
                 </Container>
                 <Container className="fGrid">
+                    {yourApplication}
                     <Card style={{ width: '18rem' }} className="card whiteText">
                         <Card.Body>
                             <div className="fLandingModUpload">
@@ -116,7 +123,6 @@ class LandingPage extends Component {
                             </Card.Text>
                         </Card.Body>
                     </Card>
-                    {yourApplication}
                 </Container>
             </>
         );

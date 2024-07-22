@@ -34,6 +34,7 @@ function authReducer(state = initialState, action){
         case navActions.LOGIN:
             Cookies.remove('userResource');
             Cookies.remove('jwt');
+            Cookies.remove('access_token');
             return{
                 ...state,
                 loggedIn: false,

@@ -9,10 +9,10 @@ const initialState = {
 function appReducer(state = initialState, action){
     switch(action.type){
         case appActions.APPLICATION_SUCCESS:
-            Cookies.set('application', [...state.application, action.application], { sameSite: 'Strict' });
+            Cookies.set('application', action.application, { sameSite: 'Strict' });
             return{
                 ...state,
-                application: [...state.application, action.application],
+                application: action.application,
             }
         case appActions.APPLICATION_FETCH_SUCCESS:
             return{
@@ -24,7 +24,7 @@ function appReducer(state = initialState, action){
             Cookies.remove('application');
             return{
                 ...state,
-                application: [],
+                application: null,
             }
         default:
             return{
