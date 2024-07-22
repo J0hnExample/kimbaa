@@ -39,7 +39,7 @@ class LandingPage extends Component {
         this.props.getApplication(appMatrikel);
         logger.info("LandingPage.js mounted!");
         setTimeout(() => {
-            if (this.props.application === undefined) {
+            if (this.props.application === null) {
                 logger.info("Reloading application");
                 this.props.getApplication(appMatrikel);
             }
