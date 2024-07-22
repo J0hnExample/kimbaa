@@ -25,9 +25,7 @@ const UserDetailsSchema = new Schema<IUserDetails>({
 // Interface for the application model
 export interface IApplication {
   id?: string;
-  creator: Types.ObjectId;
-  attach1id?: Types.ObjectId; // Optional | Anlage 1 ID
-  attach2id?: Types.ObjectId; // Optional | Anlage 2 ID
+  creator?: string;
   studentid?: string; // Required | Matrikelnummer
   department?: string; // Required | Fachbereich
   bachelor?: boolean; // Required | Bachelor
@@ -50,8 +48,6 @@ type ApplicationModel = Model<IApplication>;
 // Schema for the application model
 const ApplicationSchema = new Schema<IApplication>({
   creator: { type: Schema.Types.ObjectId, ref: "User", required: true }, // Ersteller
-  attach1id: { type: Schema.Types.ObjectId, ref: "Attachment1", required: false }, // Anlage 1 ID
-  attach2id: { type: Schema.Types.ObjectId, ref: "Attachment2", required: false }, // Anlage 2 ID
   studentid: { type: String, required: false }, // Matrikelnummer
   department: { type: String, required: false }, // Fachbereich
   bachelor: { type: Boolean, required: false }, // Bachelor

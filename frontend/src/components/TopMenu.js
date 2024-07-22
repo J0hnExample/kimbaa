@@ -2,6 +2,7 @@ import React, {Component} from "react";
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 import UserWidget from './UserWidget';
+import logger from "../logging/logger";
 
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
@@ -19,6 +20,10 @@ class TopMenu extends Component{
     constructor(props){
         super(props);
         this.contextualLogoAction = this.contextualLogoAction.bind(this);
+    }
+
+    componentDidMount(){
+        logger.info("TopMenu.js mounted!");
     }
 
     contextualLogoAction(){
@@ -58,7 +63,7 @@ class TopMenu extends Component{
                     <img alt="" src="kimbaa_logo_256.png" width="52" height="52" className="d-inline-block align-top"/>
                 </Navbar.Brand>
                 <Nav>
-                    <h2 onClick={this.contextualLogoAction}>kimbaa [playtest]</h2>
+                    <h2 onClick={this.contextualLogoAction}>kimbaa</h2>
                 </Nav>
                 {widget}
             </Navbar>

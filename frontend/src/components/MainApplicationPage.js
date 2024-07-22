@@ -1,8 +1,10 @@
 import React, {createRef, Component} from "react";
 import { connect } from "react-redux";
+import logger from "../logging/logger";
 
 import * as navActions from '../actions/NavActions';
 import * as appActions from "../actions/ApplicationActions";
+import { fetchPointStatus } from "../actions/ApplicationActions";
 import { bindActionCreators } from "redux";
 
 import Button from "react-bootstrap/Button";
@@ -35,7 +37,9 @@ class MainApplicationPage extends Component{
             appCourse: "",
             appBachelor: true,
             appMaster: false,
+            appModulePoints: 0,
             appModuleRequirementsMet: false,
+            appModuleViable: false,
             appAttachment1: false,
             appAttachment2: false,
             appNoTopicProposition: false,
@@ -51,13 +55,39 @@ class MainApplicationPage extends Component{
         this.handleSemester = this.handleSemester.bind(this);
         this.handleDegree = this.handleDegree.bind(this);
         this.handleCheckChange = this.handleCheckChange.bind(this);
-        this.handleSave = this.handleSave.bind(this);
         this.handleOpen = this.handleOpen.bind(this);
         this.handleClose = this.handleClose.bind(this);
         this.handleDateChange = this.handleDateChange.bind(this);
-        this.handleSaveReal = this.handleSaveReal.bind(this);
+        this.handleSave = this.handleSave.bind(this);
+        this.splitName = this.splitName.bind(this);
     }
 
+    async componentDidMount(){
+        logger.info("MainApplicationPage.js mounted!");
+
+        let moduleSummary = await fetchPointStatus(this.props.userResource._id);
+        if(moduleSummary){
+            this.setState({ 
+                appModulePoints: moduleSummary.credits,
+                appModuleRequirementsMet: moduleSummary.allrequired,
+                appModuleViable: moduleSummary.minreqCredits
+            });
+        }
+    }
+
+    splitName(name) {
+        const parts = name.split(' ');
+        if (parts.length > 2) {
+            const firstName = parts.slice(0, parts.length - 1).join(' ');
+            const lastName = parts[parts.length - 1];
+            return [firstName, lastName];
+        }
+        if (parts.length === 2) {
+            return parts;
+        }
+        return [name, ''];
+    }
+    
     handleInputChange(e){
         const { name, value } = e.target;
         this.setState({[name]: value});
@@ -100,16 +130,15 @@ class MainApplicationPage extends Component{
         }
     }
 
-    handleSave(e){
-        const { appSemSummer, appMatrikel, appDepartment, appName, appEmail, appPhone, appStreet, appPlace, appPostal, appCourse, appMaster, appModuleRequirementsMet, appAttachment1, appAttachment2, appNoTopicProposition, appPracticalSemesterAcknowledgement, appPracticalSemesterDone} = this.state;
-        const { saveApplication } = this.props;
-        saveApplication(appSemSummer, appMatrikel, appDepartment, appName, appEmail, appPhone, appStreet, appPlace, appPostal, appCourse, appMaster, appModuleRequirementsMet, appAttachment1, appAttachment2, appNoTopicProposition, appPracticalSemesterDone, appPracticalSemesterAcknowledgement);
-    }
 
-    handleSaveReal(e){
-        const{appMatrikel, appDepartment, appBachelor, appMaster, appPracticalSemesterDone, appPracticalSemesterAcknowledgement, appModuleRequirementsMet, appAttachment1, appAttachment2, appNoTopicProposition } =  this.state;
-        const{saveApplicationReal} = this.props;
-        saveApplicationReal(appMatrikel, appDepartment, appBachelor, appMaster, appPracticalSemesterDone, appPracticalSemesterAcknowledgement, appModuleRequirementsMet, appAttachment1, appAttachment2, appNoTopicProposition);
+    handleSave(e){
+        const{appMatrikel, appName ,appDepartment, appBachelor, appMaster, appPracticalSemesterDone, appPracticalSemesterAcknowledgement, appModuleRequirementsMet, appAttachment1, appAttachment2, appNoTopicProposition
+            , appPhone, appStreet, appPlace, appPostal,
+        } =  this.state;
+        const [firstName, lastName] = this.splitName(appName);
+        const{saveApplication} = this.props;
+        this.props.updateUserdetails(appMatrikel , appStreet, appPlace, appPostal, appPhone, firstName, lastName );
+        saveApplication(appMatrikel, appDepartment, appBachelor, appMaster, appPracticalSemesterDone, appPracticalSemesterAcknowledgement, appModuleRequirementsMet, appAttachment1, appAttachment2, appNoTopicProposition);
     }
     handleClose(){
         this.dialogRef.current.close();
@@ -118,7 +147,35 @@ class MainApplicationPage extends Component{
         this.dialogRef.current.showModal();
     };
 
-    render(){        
+    render(){
+        let requiredAbsolved = <>Du hast nicht alle Pflichtmodule absolviert. </>;
+        if(this.state.appModuleRequirementsMet === true){
+            requiredAbsolved = <>Du hast alle Pflichtmodule absolviert. </>;
+        }
+        let succeededModules = <>Du kannst daher noch keine Prüfung schreiben. Wenn diese Evaluation nicht stimmt, lade bitte deine aktuelle Modulbescheinigung auf der Hauptseite hoch. </>;
+        if(this.state.appModuleViable === true){
+            succeededModules = <>Du kannst zur Prüfung antreten!</>;
+        }
+        let specificOptions = <></>;
+        if(this.state.appCourse){
+            specificOptions = <>
+                <Form.Group controlId="furtherDetails" className="spaceTop">
+                <Form.Label className="mainApplicationLabel">Weitere Details (Zutreffendes ankreuzen):</Form.Label>
+                <Form.Check label="Die Praxisphase wurde erfolgreich abgeschlossen" name="appPracticalSemesterDone" value={this.state.appPracticalSemesterDone} onChange={this.handleCheckChange}/>
+                <Form.Check label="Die Anerkennung der Praxisphase wurde beantragt oder ist bereits erfolgt." name="appPracticalSemesterAcknowledgement" value={this.state.appPracticalSemesterAcknowledgement} onChange={this.handleCheckChange} />
+                <p><b>Du hast {this.state.appModulePoints} von 155 benötigten Credits erlangt. {requiredAbsolved}{succeededModules}</b></p>
+                <Form.Check label="Die Anlage 2 (mein Vorschlag zum Thema meiner Abschlussarbeit und des/der Betreuers*in) ist beigefügt." name="appAttachment2" value={this.state.appAttachment2} onChange={this.handleCheckChange} />
+                </Form.Group>
+                <Form.Group controlId="declarationOfWaive" className="spaceTop">
+                    <Form.Label className="mainApplicationLabel">Optionale Verzichterklärung</Form.Label>
+                    <Form.Check label={<>Einen Vorschlag für das Thema und den/die Betreuer*in meiner Abschlussarbeit unterbreite ich nicht. <b>Ich wünsche die Vergabe durch den Prüfungsausschuss</b></>} name="appNoTopicProposition" value={this.state.appNoTopicProposition} onChange={this.handleCheckChange} />
+                </Form.Group>
+            </>
+        }
+        let buttonStates = <Button className="standardButton buttonWidth" onClick={this.handleSave} disabled>Speichern</Button>;
+        if(this.state.appCourse){
+            buttonStates = <Button className="standardButton buttonWidth" onClick={this.handleSave}>Speichern</Button>;
+        }
 
         return(
             <>
@@ -186,7 +243,7 @@ class MainApplicationPage extends Component{
                 </style>
                 <div className="mainApplicationPage">
                     <h1>Antrag anlegen</h1>
-                    <Form className="mainApplicationForm">
+                    <Form className="mainApplicationForm whiteText">
                         <Form.Group controlId="personalDetails" className="itemInlineColumn">
                             <Form.Label className="mainApplicationLabel">Persönliche Daten</Form.Label>
                             <div className="itemInlineRow">
@@ -218,30 +275,16 @@ class MainApplicationPage extends Component{
                         </Form.Group>
                         <Form.Group controlId="courseInput" className="spaceTop">
                             <Form.Label className="mainApplicationLabel">In welchem Studiengang möchtest du den Kurs anlegen?</Form.Label>
-                            <input className="textInput tiWide" type="text" placeholder="Studiengang" name="appCourse" value={this.state.appCourse} onChange={this.handleInputChange} />
+                            <select className="textInput tiWide spaceTop" name="appCourse" value={this.state.appCourse} onChange={this.handleInputChange} >
+                                <option value="">Bitte wähle eine Option!</option>
+                                <option value="Medieninformatik">Medieninformatik</option>
+                            </select>
                         </Form.Group>
-                        <Form.Group controlId="furtherDetails" className="spaceTop">
-                            <Form.Label className="mainApplicationLabel">Weitere Details (Zutreffendes ankreuzen):</Form.Label>
-                            <Form.Group >
-                                <Form.Check label="Die Praxisphase wird abgeleistet vom:"  /> 
-                                <input type="date" name="dateFrom" value={this.state.dateFrom} onChange={this.handleDateChange} placeholder="" />
-                                <Form.Label >bis</Form.Label>
-                                <input type="date" name="dateTo" value={this.state.dateTo} onChange={this.handleDateChange} placeholder="" />
-                            </Form.Group> 
-                            <Form.Check label="Die Praxisphase wurde erfolgreich abgeschlossen" name="appPracticalSemesterDone" value={this.state.appPracticalSemesterDone} onChange={this.handleCheckChange}/>
-                            <Form.Check label="Die Anerkennung der Praxisphase wurde beantragt oder ist bereits erfolgt." name="appPracticalSemesterAcknowledgement" value={this.state.appPracticalSemesterAcknowledgement} onChange={this.handleCheckChange} />
-                            <Form.Check label="Sämtliche erforderliche Module des Bachelor- oder Masterstudiums sind erfolgreich abgeschlossen." name="appModuleRequirementsMet" value={this.state.appModuleRequirementsMet} onChange={this.handleCheckChange} />
-                            <Form.Check label="Der erfolgreiche Abschluss der in Anlage 1 angeführten Module steht noch aus" name="appAttachment1" value={this.state.appAttachment1} onChange={this.handleCheckChange} />
-                            <Form.Check label="Die Anlage 2 (mein Vorschlag zum Thema meiner Abschlussarbeit und des/der Betreuers*in) ist beigefügt." name="appAttachment2" value={this.state.appAttachment2} onChange={this.handleCheckChange} />
-                        </Form.Group>
-                        <Form.Group controlId="declarationOfWaive" className="spaceTop">
-                            <Form.Label className="mainApplicationLabel">Optionale Verzichterklärung</Form.Label>
-                            <Form.Check label={<>Einen Vorschlag für das Thema und den/die Betreuer*in meiner Abschlussarbeit unterbreite ich nicht. <b>Ich wünsche die Vergabe durch den Prüfungsausschuss</b></>} name="appNoTopicProposition" value={this.state.appNoTopicProposition} onChange={this.handleCheckChange} />
-                        </Form.Group>
+                        {specificOptions}
                         <Form.Group controlId="SubmitOrLeave" className="spaceTop spaceBottom">
                             <div className="itemInlineRow">
                                 <Button className="standardButton buttonWidth aCancel" onClick={this.handleOpen}>Abbrechen</Button>
-                                <Button className="standardButton buttonWidth" onClick={this.handleSaveReal}>Speichern</Button>
+                                {buttonStates}
                             </div>
                         </Form.Group>
                     </Form>
@@ -260,8 +303,8 @@ class MainApplicationPage extends Component{
 
 const mapDispatchToProps = dispatch => bindActionCreators({
     moveToLanding: navActions.getNavLandingAction,
-    saveApplication: appActions.saveApplication,
-    saveApplicationReal: appActions.saveApplicationAction,
+    saveApplication: appActions.saveApplicationAction,
+    updateUserdetails: appActions.putUserdetailsAction,
 }, dispatch)
 
 export default connect(mapStateToProps, mapDispatchToProps)(MainApplicationPage);

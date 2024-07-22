@@ -1,27 +1,30 @@
+import dotenv from "dotenv";
+dotenv.config();
 import supertest from "supertest";
 import app from "../../src/app";
 import { User } from '../../src/model/UserModel';
 import * as antragZulassungService from "../../src/services/AntragZulassungService";
 import * as userService from "../../src/services/UserService";
-
-
-
+import { performAuthentication, supertestWithAuth } from "../supertestWithAuth";
 
 beforeEach(async () => {
+    await User.deleteMany({});
     const user = new User({
         name: "DerOtto",
-        password: "test",
-        admin: false,
+        password: "12345bcdABCD..;,.",
+        admin: true,
         studentId: "666456",
         email: "test@bht-berlin.de",
         course: "6",
     });
     await user.save();
+
+    await performAuthentication("666456", "test");
 });
 
-
 test("GET /userdetails/:identifier - success", async () => {
-    const testee = supertest(app);
+    const token = await performAuthentication("666456", "12345bcdABCD..;,.");
+    const testee = supertestWithAuth(app);
     const user = await userService.getOneUser({ studentId: "666456" });
     const application = await antragZulassungService.createApplication({
         creator: user.id,
@@ -46,7 +49,6 @@ test("GET /userdetails/:identifier - success", async () => {
         topicSuggestion: false,
         date: new Date(),
     });
-    
 
     const res = await testee.get("/api/userdetails/666456");
 
@@ -60,16 +62,12 @@ test("GET /userdetails/:identifier - success", async () => {
     expect(userDetails.postalCode).toBe("12345");
     expect(userDetails.country).toBe("Deutschland");
     expect(userDetails.phone).toBe("0123456789");
-    
-})
-
+});
 
 test("PUT /userdetails/:identifier - success with no existing application", async () => {
-    const testee = supertest(app);
+    const token = await performAuthentication("666456", "12345bcdABCD..;,.");
+    const testee = supertestWithAuth(app);
     const user = await userService.getOneUser({ studentId: "666456" });
-    
-    // Stellen Sie sicher, dass kein Antrag für diesen Benutzer existiert
-
 
     const newUserDetails = {
         lastName: "Musterfrau",
@@ -86,18 +84,16 @@ test("PUT /userdetails/:identifier - success with no existing application", asyn
     expect(res.status).toBe(200);
     expect(res.body.antragZulassungDetails.lastName).toEqual(newUserDetails.lastName);
     expect(res.body.antragZulassungDetails.firstName).toEqual(newUserDetails.firstName);
-    // und so weiter für die anderen Attribute
-
-    // Überprüfen Sie, ob jetzt ein Antrag für diesen Benutzer existiert
+    
     const application = await antragZulassungService.getApplicationById(user.id!);
     expect(application).not.toBeNull();
     expect(application!.userDetails!.lastName).toEqual(newUserDetails.lastName);
     expect(application!.userDetails!.firstName).toEqual(newUserDetails.firstName);
-    // und so weiter für die anderen Attribute
 });
 
 test("PUT /userdetails/:identifier - success with existing application", async () => {
-    const testee = supertest(app);
+    const token = await performAuthentication("666456", "12345bcdABCD..;,.");
+    const testee = supertestWithAuth(app);
     const user = await userService.getOneUser({ studentId: "666456" });
     const application = await antragZulassungService.createApplication({
         creator: user.id,
@@ -122,8 +118,6 @@ test("PUT /userdetails/:identifier - success with existing application", async (
         topicSuggestion: false,
         date: new Date(),
     });
-    // Stellen Sie sicher, dass kein Antrag für diesen Benutzer existiert
-
 
     const newUserDetails = {
         lastName: "Musterfrau",
@@ -140,12 +134,9 @@ test("PUT /userdetails/:identifier - success with existing application", async (
     expect(res.status).toBe(200);
     expect(res.body.antragZulassungDetails.lastName).toEqual(newUserDetails.lastName);
     expect(res.body.antragZulassungDetails.firstName).toEqual(newUserDetails.firstName);
-    // und so weiter für die anderen Attribute
 
-    // Überprüfen Sie, ob jetzt ein Antrag für diesen Benutzer existiert
-    const foundapplication = await antragZulassungService.getApplicationById(user.id!);
-    expect(foundapplication).not.toBeNull();
-    expect(foundapplication!.userDetails!.lastName).toEqual(newUserDetails.lastName);
-    expect(foundapplication!.userDetails!.firstName).toEqual(newUserDetails.firstName);
-    // und so weiter für die anderen Attribute
+    const foundApplication = await antragZulassungService.getApplicationById(user.id!);
+    expect(foundApplication).not.toBeNull();
+    expect(foundApplication!.userDetails!.lastName).toEqual(newUserDetails.lastName);
+    expect(foundApplication!.userDetails!.firstName).toEqual(newUserDetails.firstName);
 });

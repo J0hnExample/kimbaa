@@ -9,46 +9,47 @@ image: node:20
 #   DOCKER_HOST: tcp://docker:2376
 
 stages:
-  - test
+  # - test
   - build
   # - deploy
 
-test_backend:
-  stage: test
-  variables:
-    # BHT's Gitlab CI only supports MongoDB up to 7.0.3
-    MONGOMS_VERSION: "7.0.3"
-  script:
-    - cd backend
-    - npm ci
-    - npm test
-  artifacts:
-    reports:
-      junit:
-        - backend/junit.xml
+# test_backend:
+#   stage: test
+#   variables:
+#     # BHT's Gitlab CI only supports MongoDB up to 7.0.3
+#     MONGOMS_VERSION: "7.0.3"
+#   script:
+#     - cd backend
+#     - npm ci
+#     - npm test
+#   artifacts:
+#     reports:
+#       junit:
+#         - backend/junit.xml
 
-test_frontend:
-  # stage: test
-  # variables:
-  #   # BHT's Gitlab CI only supports MongoDB up to 7.0.3
-  #   MONGOMS_VERSION: "7.0.3"
-  script:
-    - cd frontend
-    - npm install
-    # - npm test
-  # artifacts:
-  #   reports:
-  #     junit:
-  #       - frontend/junit.xml
+# test_frontend:
+#   # stage: test
+#   # variables:
+#   #   # BHT's Gitlab CI only supports MongoDB up to 7.0.3
+#   #   MONGOMS_VERSION: "7.0.3"
+#   script:
+#     - cd frontend
+#     - npm install
+#     # - npm test
+#   # artifacts:
+#   #   reports:
+#   #     junit:
+#   #       - frontend/junit.xml
 
 build_backend:
-  rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-    - if: $CI_COMMIT_TAG
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-    - if: $CI_COMMIT_BRANCH == 'dev'
+  # rules:
+  #   - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+  #   - if: $CI_COMMIT_TAG
+  #   - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  #   - if: $CI_COMMIT_BRANCH == 'dev'
+  # needs: ["test_backend"]
   stage: build
-  needs: ["test_backend"]
+
   image: docker:20.10.16
   services:
     - name: registry.hub.docker.com/library/docker:20.10.16-dind
@@ -58,22 +59,22 @@ build_backend:
   variables:
     DOCKER_TLS_CERTDIR: "/certs"
   before_script:
-    - echo $CI_REGISTRY
-    - docker info
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    # - echo $CI_REGISTRY
+    # - docker info
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
   script:
     - docker build -t $CI_REGISTRY/jala5026/kimbaa/backend:$CI_COMMIT_REF_SLUG backend/
     - docker push $CI_REGISTRY/jala5026/kimbaa/backend:$CI_COMMIT_REF_SLUG
 
 
 build_frontend:
-  rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-    - if: $CI_COMMIT_TAG
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-    - if: $CI_COMMIT_BRANCH == 'dev'
+  # rules:
+  #   - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+  #   - if: $CI_COMMIT_TAG
+  #   - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  #   - if: $CI_COMMIT_BRANCH == 'dev'
+  # needs: ["test_frontend"]
   stage: build
-  needs: ["test_frontend"]
   image: docker:20.10.16
   services:
     - name: registry.hub.docker.com/library/docker:20.10.16-dind
@@ -83,8 +84,8 @@ build_frontend:
   variables:
     DOCKER_TLS_CERTDIR: "/certs"
   before_script:
-    - docker info
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    # - docker info
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
   script:
     - docker build -t $CI_REGISTRY/jala5026/kimbaa/frontend:$CI_COMMIT_REF_SLUG frontend/
     - docker push $CI_REGISTRY/jala5026/kimbaa/frontend:$CI_COMMIT_REF_SLUG

@@ -30,7 +30,7 @@ export type ModulListResource = {
     updatedAt?: string;
 }
 
-export type UserDetailsResource = {
+export type userDetailsResource = {
     lastName?: string; // Nachname
     firstName?: string; // Vorname
     street?: string; // Straße
@@ -49,7 +49,7 @@ export type UserDetailsResource = {
     department?: string; // Fachbereich
     bachelor?: boolean; // Bachelor
     master?: boolean; // Master
-    userDetails?: UserDetailsResource; // Benutzerdaten
+    userDetails?: userDetailsResource; // Benutzerdaten
     internshipCompleted?: boolean; // Praxisphase abgeschlossen
     recognitionApplied?: boolean; // Anerkennung beantragt
     internshipCompletedFrom?: Date; // Praxisphase abgeleistet von
@@ -58,6 +58,8 @@ export type UserDetailsResource = {
     modulesPending?: boolean; // Module ausstehend
     attachment2Included?: boolean; // Anlage 2 beigefügt
     topicSuggestion?: boolean; // Thema vorgeschlagen
+    sommersemester?: boolean; // Sommersemester
+    wintersemester?: boolean; // Wintersemester
     date?: Date; // Datum
   }
 
@@ -71,4 +73,24 @@ export type LoginResource = {
     role: "a"|"u"
     /** Expiration time in seconds since 1.1.1970 */
     exp: number
+}
+
+export type AntragAnlage2Resource = {
+    id?: string;
+    creator?: string;
+    themenvorschlag?: string;
+    betreuung1?: string;
+    akademischerGradVonBetreuung1?: string;
+    betreuung2?: string;
+    akademischerGradVonBetreuung2?: string;
+    arbeitAlsGruppenarbeit?: boolean;
+    gruppenmitglied1?: string;
+    matrikelnummerVonGruppenmitglied1?: number;
+    gruppenmitglied2?: string;
+    matrikelnummerVonGruppenmitglied2?: number;
+    studentenSindAnHochschule?: boolean;
+    studentenSindBeiFirma?: boolean;
+    startVorlesungszeit?: boolean;
+    startZum?: Date;
+    begruendungFuerDatum?: string;
 }
