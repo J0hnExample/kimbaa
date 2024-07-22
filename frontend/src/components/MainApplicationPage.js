@@ -181,10 +181,6 @@ class MainApplicationPage extends Component{
             <>
                 <style>
                     {`
-                        .itemInlineRow{
-                            display: flex;
-                            flex-direction: row;
-                        }
                         .itemInlineColumn{
                             display: flex;
                             flex-direction: column;

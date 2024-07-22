@@ -224,3 +224,8 @@ h1, h2, h3 {
 .whiteText{
   color: white;
 }
+
+.itemInlineRow{
+  display: flex;
+  flex-direction: row;
+}

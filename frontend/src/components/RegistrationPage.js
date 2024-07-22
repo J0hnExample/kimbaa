@@ -23,6 +23,7 @@ class RegistrationPage extends Component{
         this.state = {
             regMatrikel: "",
             regName: "",
+            regSurname: "",
             regEmail: "",
             regPassword: "",
             regPasswordRe: "",
@@ -115,7 +116,7 @@ class RegistrationPage extends Component{
     handleRegistration(e){
         let hasFailed = false;
         e.preventDefault();
-        const { regMatrikel, regName, regEmail, regPassword, regPasswordRe } = this.state;
+        const { regMatrikel, regName, regSurname, regEmail, regPassword, regPasswordRe } = this.state;
         const { register } = this.props;
         if(regPassword !== regPasswordRe){
             this.setState({
@@ -147,7 +148,7 @@ class RegistrationPage extends Component{
             })
             hasFailed = true;
         }
-        if(regMatrikel === "" || regName === "" || regEmail === "" || regPassword === ""){
+        if(regMatrikel === "" || regName === "" || regEmail === "" || regPassword === "" || regSurname === ""){
             this.setState({
                 incompleteForm: true,
             })
@@ -156,7 +157,8 @@ class RegistrationPage extends Component{
         if(hasFailed){
             return;
         }
-        console.log("Time to doxx the new user! Matrikel: "+regMatrikel+", Name: "+regName+", Email: "+regEmail+", Password: "+regPassword);
+        let fullName = regSurname + " " + regName;
+        console.log("Time to doxx the new user! Matrikel: "+regMatrikel+", Name: "+fullName+", Email: "+regEmail+", Password: "+regPassword);
         register(regMatrikel, regName, regEmail, regPassword);
     }
 
@@ -224,6 +226,14 @@ class RegistrationPage extends Component{
                             border: none;
                             margin-top: 10px;
                         }
+                        .regInNarrow{
+                            width: 16vw;
+                            height: 26px;
+                            border-radius: 10px;
+                            border: none;
+                            margin-top: 10px;
+                            margin-right: calc(3vw - 5px);
+                        }
                         .firstItem{
                             margin-top: 30px;
                         }
@@ -235,7 +245,10 @@ class RegistrationPage extends Component{
                         <h2>Kein Problem - registriere dich hier!</h2>
                         <Form className="fBody">
                             <input className="regIn firstItem" type="number" id="matrikel" name="regMatrikel" value={this.state.regMatrikel} placeholder="Matrikelnr." onChange={this.handleInputChange}/>
-                            <input className="regIn" type="text" id="name" name="regName" value={this.state.regName} placeholder="Name" onChange={this.handleInputChange}/>
+                            <div className="itemInlineRow">
+                                <input className="regInNarrow" type="text" id="name" name="regName" value={this.state.regName} placeholder="Nachname" onChange={this.handleInputChange}/>
+                                <input className="regInNarrow" type="text" id="surname" name="regSurName" value={this.state.regSurname} placeholder="Vorname" onChange={this.handleInputChange}/>
+                            </div>
                             <input className="regIn" type="email" id="email" name="regEmail" value={this.state.regEmail}placeholder="Email (muss auf '@bht-berlin.de' enden)" onChange={this.handleInputChange}/>
                             <select className="regIn" id="courseSelector" name="regCourse" value={this.state.regCourse} onChange={this.handleInputChange}>
                                 <option value="">Kurs auswählen (Optional)</option>
