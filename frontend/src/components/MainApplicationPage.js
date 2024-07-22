@@ -137,8 +137,8 @@ class MainApplicationPage extends Component{
         } =  this.state;
         const [firstName, lastName] = this.splitName(appName);
         const{saveApplication} = this.props;
-        this.props.updateUserdetails(appMatrikel , appStreet, appPlace, appPostal, appPhone, firstName, lastName );
-        saveApplication(appMatrikel, appDepartment, appBachelor, appMaster, appPracticalSemesterDone, appPracticalSemesterAcknowledgement, appModuleRequirementsMet, appAttachment1, appAttachment2, appNoTopicProposition);
+        saveApplication(appMatrikel, appDepartment, appBachelor, appMaster, appPracticalSemesterDone, appPracticalSemesterAcknowledgement, appModuleRequirementsMet, appAttachment1, appAttachment2, appNoTopicProposition, firstName, lastName, appPhone, appStreet, appPlace, appPostal);
+        this.props.moveToLanding();
     }
     handleClose(){
         this.dialogRef.current.close();
@@ -161,14 +161,14 @@ class MainApplicationPage extends Component{
             specificOptions = <>
                 <Form.Group controlId="furtherDetails" className="spaceTop">
                 <Form.Label className="mainApplicationLabel">Weitere Details (Zutreffendes ankreuzen):</Form.Label>
-                <Form.Check label="Die Praxisphase wurde erfolgreich abgeschlossen" name="appPracticalSemesterDone" value={this.state.appPracticalSemesterDone} onChange={this.handleCheckChange}/>
-                <Form.Check label="Die Anerkennung der Praxisphase wurde beantragt oder ist bereits erfolgt." name="appPracticalSemesterAcknowledgement" value={this.state.appPracticalSemesterAcknowledgement} onChange={this.handleCheckChange} />
+                <Form.Check label="Die Praxisphase wurde erfolgreich abgeschlossen" name="appPracticalSemesterDone" checked={this.state.appPracticalSemesterDone} onChange={this.handleCheckChange}/>
+                <Form.Check label="Die Anerkennung der Praxisphase wurde beantragt oder ist bereits erfolgt." name="appPracticalSemesterAcknowledgement" checked={this.state.appPracticalSemesterAcknowledgement} onChange={this.handleCheckChange} />
                 <p><b>Du hast {this.state.appModulePoints} von 155 benötigten Credits erlangt. {requiredAbsolved}{succeededModules}</b></p>
-                <Form.Check label="Die Anlage 2 (mein Vorschlag zum Thema meiner Abschlussarbeit und des/der Betreuers*in) ist beigefügt." name="appAttachment2" value={this.state.appAttachment2} onChange={this.handleCheckChange} />
+                <Form.Check label="Die Anlage 2 (mein Vorschlag zum Thema meiner Abschlussarbeit und des/der Betreuers*in) ist beigefügt." name="appAttachment2" checked={this.state.appAttachment2} onChange={this.handleCheckChange} />
                 </Form.Group>
                 <Form.Group controlId="declarationOfWaive" className="spaceTop">
                     <Form.Label className="mainApplicationLabel">Optionale Verzichterklärung</Form.Label>
-                    <Form.Check label={<>Einen Vorschlag für das Thema und den/die Betreuer*in meiner Abschlussarbeit unterbreite ich nicht. <b>Ich wünsche die Vergabe durch den Prüfungsausschuss</b></>} name="appNoTopicProposition" value={this.state.appNoTopicProposition} onChange={this.handleCheckChange} />
+                    <Form.Check label={<>Einen Vorschlag für das Thema und den/die Betreuer*in meiner Abschlussarbeit unterbreite ich nicht. <b>Ich wünsche die Vergabe durch den Prüfungsausschuss</b></>} name="appNoTopicProposition" checked={this.state.appNoTopicProposition} onChange={this.handleCheckChange} />
                 </Form.Group>
             </>
         }
@@ -304,7 +304,6 @@ class MainApplicationPage extends Component{
 const mapDispatchToProps = dispatch => bindActionCreators({
     moveToLanding: navActions.getNavLandingAction,
     saveApplication: appActions.saveApplicationAction,
-    updateUserdetails: appActions.putUserdetailsAction,
 }, dispatch)
 
 export default connect(mapStateToProps, mapDispatchToProps)(MainApplicationPage);
