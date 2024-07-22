@@ -72,7 +72,7 @@ Die live seite: [kimbaa-demo.de](https://kimbaa-demo.de)
 
 - GitLab build pipelines
 - Docker
-- (Kubernetes)
+- Nginx (reverse proxy)
 
 
 ## Weitere Punkte
