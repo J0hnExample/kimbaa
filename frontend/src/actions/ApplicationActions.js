@@ -335,7 +335,7 @@ function putUserdetails( studentId, street, city, postalCode, phone , nameFirst,
         credentials: 'include'
     }
 
-    console.log("fetching:" + BACKEND_URL + '/api/userdetails/' + Id)
+    console.log("fetching:" + BACKEND_URL + '/api/userdetails/' + studentId)
     return fetch(BACKEND_URL + '/api/userdetails/' + studentId, requestOptions)
         .then(response => {
             if(!response.ok){
