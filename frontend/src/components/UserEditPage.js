@@ -49,6 +49,7 @@ class UserEditPage extends Component{
         logger.info("UserEditPage.js mounted!");
     }
 
+    //teilt den Namen in zwei
     splitName(name) {
         const parts = name.split(' ');
         if (parts.length > 2) {

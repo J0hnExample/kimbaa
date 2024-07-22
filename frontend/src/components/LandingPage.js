@@ -52,6 +52,7 @@ class LandingPage extends Component {
         }
     }
 
+    //holt den Antrag aus dem Backend und öffnet diesen als neuen Tab
     handlePrintApplication(){
         const { appMatrikel } = this.state;
         const { getPDFAntrag } = this.props;

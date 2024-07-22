@@ -11,6 +11,7 @@ function getSaveApplicationPending(){ return { type: APPLICATION_PENDING } }
 function getSaveApplicationFail(err){ return { type: APPLICATION_FAILURE, err: err } }
 function getSaveApplicationSuccess(){ return { type: APPLICATION_SUCCESS, payload: 'landing' } }
 
+//aktualisiert den antrag des benutzters mit der angegbenen studentId
 export function saveApplicationAction(studentId, department,bachelor, master, practicalDone, practicalAcknowlegded, reqMet, att1, att2, noTopicProposition, firstName, lastName, Phone, Street, Place, Postal ){
     return dispatch => {
         dispatch(getSaveApplicationPending());
@@ -79,6 +80,7 @@ function getSaveUserPending(){ return { type: USER_PENDING } }
 function getSaveUserFail(err){ return { type: USER_FAILURE, err: err } }
 function getSaveUserSuccess(){ return { type: USER_SUCCESS} }
 
+//aktualisiert den User mit der angegbenen studentId
 export const saveUserAction = (studentId, name, email, course, id) => async (dispatch) => {
     dispatch(getSaveUserPending());
     try {
@@ -132,6 +134,7 @@ export const REFRESH_FAILURE = "REFRESH_FAILURE";
 function getRefreshResourceFailure(){ return { type: REFRESH_FAILURE, payload: 'landing' } }
 function getRefreshResourceSuccess(userResource){ return { type: REFRESH_SUCCESS, userResource: userResource, payload: 'landing' } }
 
+//lädt die Userresource neu
 export const refreshUE = (studentId) => async (dispatch) => {
     try {
         const resource = await refreshUserResource(studentId);
@@ -165,7 +168,7 @@ export const APPLICATION_FETCH_PENDING = "APPLICATION_FETCH_PENDING";
 export const APPLICATION_FETCH_FAILURE = "APPLICATION_FETCH_FAILURE";
 export const APPLICATION_FETCH_SUCCESS = "APPLICATION_FETCH_SUCCESS";
 
-
+//fetcht die Application des Users mit der angegbenen studentId
 function getFetchApplicationPending(){ return { type: APPLICATION_FETCH_PENDING } }
 function getFetchApplicationFail(err){ return { type: APPLICATION_FETCH_FAILURE, err: err } }
 function getFetchApplicationSuccess(application){ return { type: APPLICATION_FETCH_SUCCESS, application: application, payload: 'landing' } }
@@ -250,6 +253,7 @@ export const GET_PDFANTRAG_PENDING = "GET_PDFANTRAG_PENDING";
 export const GET_PDFANTRAG_SUCCESS = "GET_PDFANTRAG_SUCCESS";
 export const GET_PDFANTRAG_FAILURE = "GET_PDFANTRAG_FAILURE";
 
+//fetcht die Pdf Version des Antrags aus dem Backend und öffnet diesen dann als neues Fenster
 function getPDFAntragPending(){ return { type: GET_PDFANTRAG_PENDING } };
 function getPDFAntragFailure(err){ return { type: GET_PDFANTRAG_FAILURE, err: err } };
 function getPDFAntragSuccess(blob){ return { type: GET_PDFANTRAG_SUCCESS, payload:blob } };
@@ -302,6 +306,7 @@ function getPutUserdetailsPending(){ return { type: PUT_USERDETAILS_PENDING } }
 function getPutUserdetailsFail(err){ return { type: PUT_USERDETAILS_FAILURE, err: err } }
 function getPutUserdetailsSuccess(){ return { type: PUT_USERDETAILS_SUCCESS,  } }
 
+//updated die Userdetails
 export function putUserdetailsAction(studentId, street, city, postalCode, phone, nameFirst, nameLast){
     return dispatch => {
         dispatch(getPutUserdetailsPending());
@@ -376,6 +381,7 @@ function getPutUserdetailsApplicationPending(){ return { type: PUT_USERDETAILS_A
 function getPutUserdetailsApplicationFail(err){ return { type: PUT_USERDETAILS_APPLICATION_FAILURE, err: err } }
 function getPutUserdetailsApplicationSuccess(){ return { type: PUT_USERDETAILS_APPLICATION_SUCCESS } }
 
+//updated die userdetails über die application route, was verlässlicher ist wenn der User noch keinen antrag erstellt hat
 export function saveUserdetailsApplicationAction(studentId, firstName, lastName, Phone, Street, Place, Postal ){
     return dispatch => {
         dispatch(getPutUserdetailsApplicationPending());
@@ -391,7 +397,8 @@ export function saveUserdetailsApplicationAction(studentId, firstName, lastName,
 
 function saveUserdetailsApplication( studentId, firstName, lastName, Phone, Street, Place, Postal ){
     const ApplicationForm = {
-        studentId: studentId, // Matrikelnummer
+        studentid: studentId, // Matrikelnummer
+
         userDetails: 
         { 
             lastName: lastName, 

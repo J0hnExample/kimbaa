@@ -19,6 +19,7 @@ function getLoginPending() { return { type: LOGIN_PENDING } }
 function getLoginFail(err) { return { type: LOGIN_FAILURE, err: err } }
 function getLoginSuccess(user, jwt) { return { type: LOGIN_SUCCESS, userResource: user, userToken: jwt, payload: 'landing' } }
 
+//erstellt einen neuen Nutzer mit den angegebenen Daten
 export function registerUserAction(matrikel, name, email, password, course) {
     return dispatch => {
         dispatch(getRegistrationPending());
@@ -68,6 +69,7 @@ function registerUser(matrikel, name, email, password, course) {
         })
 }
 
+//loggt den Benutzter als den angegbenen User ein
 export function loginAction(loginId, password) {
     return dispatch => {
         dispatch(getLoginPending());

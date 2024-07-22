@@ -75,6 +75,7 @@ class MainApplicationPage extends Component{
         }
     }
 
+    //teilt den namen in zwei 
     splitName(name) {
         const parts = name.split(' ');
         if (parts.length > 2) {
@@ -101,9 +102,9 @@ class MainApplicationPage extends Component{
     handleDateChange(e){
         const { name, value } = e.target;
         this.setState({[name]: value});
-        //implement min and max here
     }
 
+    //sorgt dafür, das Sommer und Winter Semester nicht gleichzeitig angekreuzt werden können
     handleSemester(e){
         const { name, checked } = e.target;
         this.setState({[name]: checked});
@@ -117,6 +118,7 @@ class MainApplicationPage extends Component{
         }
     }
 
+    //sorgt dafür das Bachelor und Master nicht gleichzeitig angekreuzt werden können
     handleDegree(e){
         const { name, checked } = e.target;
         this.setState({[name]: checked});
@@ -130,7 +132,7 @@ class MainApplicationPage extends Component{
         }
     }
 
-
+    //Aktulisiert den Antrag und kehrt zur Landing Page zurück
     handleSave(e){
         const{appMatrikel, appName ,appDepartment, appBachelor, appMaster, appPracticalSemesterDone, appPracticalSemesterAcknowledgement, appModuleRequirementsMet, appAttachment1, appAttachment2, appNoTopicProposition
             , appPhone, appStreet, appPlace, appPostal,

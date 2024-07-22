@@ -7,12 +7,12 @@ services:
     ports:
       - "3000:3000"
     env_file:
-      - backend/.env
+      - frontend/.env
     environment:
       - HOSTNAME=localhost
       - HTTP_PORT=3000
       - HTTPS_PORT=3443
-      - HTTPS=true
+      #- HTTPS=true
       - BACKEND_URL=https://localhost:3443 # oder die entsprechende URL
     networks:
       - loki
@@ -29,10 +29,10 @@ services:
       - DB_CONNECTION_STRING=mongodb://root:example@mongo:27017/
       - HTTP_PORT=3000
       - FRONTEND_PORT=3000
-      - USE_SSL=true
-      - HTTPS_PORT=3443
-      - SSL_KEY_FILE=/backend/cert/private.key
-      - SSL_CRT_FILE=/backend/cert/public.crt
+      #- USE_SSL=true
+      #- HTTPS_PORT=3443
+      #- SSL_KEY_FILE=/backend/cert/private.key
+      #- SSL_CRT_FILE=/backend/cert/public.crt
     volumes:
       - ./backend:/backend
       - ./backend/cert:/backend/cert
