@@ -247,7 +247,7 @@ class RegistrationPage extends Component{
                             <input className="regIn firstItem" type="number" id="matrikel" name="regMatrikel" value={this.state.regMatrikel} placeholder="Matrikelnr." onChange={this.handleInputChange}/>
                             <div className="itemInlineRow">
                                 <input className="regInNarrow" type="text" id="name" name="regName" value={this.state.regName} placeholder="Nachname" onChange={this.handleInputChange}/>
-                                <input className="regInNarrow" type="text" id="surname" name="regSurName" value={this.state.regSurname} placeholder="Vorname" onChange={this.handleInputChange}/>
+                                <input className="regInNarrow" type="text" id="surname" name="regSurname" value={this.state.regSurname} placeholder="Vorname" onChange={this.handleInputChange}/>
                             </div>
                             <input className="regIn" type="email" id="email" name="regEmail" value={this.state.regEmail}placeholder="Email (muss auf '@bht-berlin.de' enden)" onChange={this.handleInputChange}/>
                             <select className="regIn" id="courseSelector" name="regCourse" value={this.state.regCourse} onChange={this.handleInputChange}>
