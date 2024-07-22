@@ -38,6 +38,11 @@ class LandingPage extends Component {
 
         this.props.getApplication(appMatrikel);
         logger.info("LandingPage.js mounted!");
+        setTimeout(() => {
+            if (this.props.application === null) {
+                this.props.getApplication(appMatrikel);
+            }
+        }, 5000);
     }
 
     componentDidUpdate(prevProps) {

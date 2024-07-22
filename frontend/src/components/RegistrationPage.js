@@ -159,7 +159,7 @@ class RegistrationPage extends Component{
         }
         let fullName = regSurname + " " + regName;
         console.log("Time to doxx the new user! Matrikel: "+regMatrikel+", Name: "+fullName+", Email: "+regEmail+", Password: "+regPassword);
-        register(regMatrikel, regName, regEmail, regPassword);
+        register(regMatrikel, fullName, regEmail, regPassword);
     }
 
     render(){
