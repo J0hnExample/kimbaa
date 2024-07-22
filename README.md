@@ -8,6 +8,8 @@ KiMBAA Data-Scraper-Web-App zum Extrahieren von Daten und Stellen von Anträgen
 
 "kimbaa" soll Studierende beim application ihrer Bachelorarbeit unterstützen, indem sie die Voraussetzungen vorab prüft und wichtige Hilfestellungen und Planungshinweise gibt.
 
+Die live seite: [kimbaa-demo.de](https://kimbaa-demo.de)
+
 ---
 
 ## Funktionen
