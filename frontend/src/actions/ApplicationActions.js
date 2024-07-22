@@ -16,7 +16,7 @@ export function saveApplicationAction(studentId, department,bachelor, master, pr
         dispatch(getSaveApplicationPending());
         saveApplication(studentId, department, bachelor, master, practicalDone, practicalAcknowlegded, reqMet, att1, att2, noTopicProposition, firstName, lastName, Phone, Street, Place, Postal )
             .then(() => {
-                Cookies.set('currentPage', 'Landing', { sameSite: 'Strict' })
+                Cookies.set('currentPage', 'landing', { sameSite: 'Strict' })
                 dispatch(getSaveApplicationSuccess())
             })
             .catch(err => {
