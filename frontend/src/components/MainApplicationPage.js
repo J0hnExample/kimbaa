@@ -145,8 +145,8 @@ class MainApplicationPage extends Component{
             await this.props.moveToLanding();
         } catch (error) {
             console.error("Error saving application and returning to landing:", error);
+        }
     }
-
     handleClose(){
         this.dialogRef.current.close();
     };
