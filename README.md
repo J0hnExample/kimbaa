@@ -1,4 +1,4 @@
-# [KiMBAA](kimbaa-demo.de "Kimbaa website")
+# [KiMBAA](https://kimbaa-demo.de "Kimbaa website")
 
 
 ![Kimbaa logo](/res/kimbaa_logo.jpg "kimbaa logo")
