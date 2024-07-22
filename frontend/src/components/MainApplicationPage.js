@@ -133,15 +133,20 @@ class MainApplicationPage extends Component{
     }
 
     //Aktulisiert den Antrag und kehrt zur Landing Page zurück
-    handleSave(e){
+    async handleSave(e){
         const{appMatrikel, appName ,appDepartment, appBachelor, appMaster, appPracticalSemesterDone, appPracticalSemesterAcknowledgement, appModuleRequirementsMet, appAttachment1, appAttachment2, appNoTopicProposition
             , appPhone, appStreet, appPlace, appPostal,
         } =  this.state;
         const [firstName, lastName] = this.splitName(appName);
         const{saveApplication} = this.props;
-        saveApplication(appMatrikel, appDepartment, appBachelor, appMaster, appPracticalSemesterDone, appPracticalSemesterAcknowledgement, appModuleRequirementsMet, appAttachment1, appAttachment2, appNoTopicProposition, firstName, lastName, appPhone, appStreet, appPlace, appPostal);
-        this.props.moveToLanding();
+        try {
+            await saveApplication(appMatrikel, appDepartment, appBachelor, appMaster, appPracticalSemesterDone, appPracticalSemesterAcknowledgement, appModuleRequirementsMet, appAttachment1, appAttachment2, appNoTopicProposition, firstName, lastName, appPhone, appStreet, appPlace, appPostal);
+            await this.props.getApplication(appMatrikel);
+            await this.props.moveToLanding();
+        } catch (error) {
+            console.error("Error saving application and returning to landing:", error);
     }
+
     handleClose(){
         this.dialogRef.current.close();
     };
